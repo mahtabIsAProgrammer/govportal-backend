@@ -3,6 +3,7 @@ import e from "express";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 
 const app = e();
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/services", serviceRoutes);
+app.use("/requests", requestRoutes);
 app.use("/departments", departmentRoutes);
 
 app.listen(PORT, () =>
