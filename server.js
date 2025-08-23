@@ -6,6 +6,7 @@ import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
 
 const app = e();
 const PORT = 3000 || process.env.PORT;
@@ -22,6 +23,7 @@ app.use("/services", serviceRoutes);
 app.use("/requests", requestRoutes);
 app.use("/departments", departmentRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/documents", documentRoutes);
 
 app.listen(PORT, () =>
   console.log(`Server is running on http://localhost:${PORT}`)
