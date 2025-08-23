@@ -11,21 +11,26 @@ export const documentById = async (id) => {
   return result.rows[0];
 };
 
-export const createDocument = async ({ request_id, file_path, file_type }) => {
+export const createDocument = async ({
+  amount,
+  status,
+  payment_date,
+  transaction_id,
+}) => {
   const result = await db.query(
-    "INSERT INTO documents (request_id, file_path, file_type) VALUES ($1, $2, $3) RETURNING *",
-    [request_id, file_path, file_type]
+    "INSERT INTO documents (amount, status, payment_date, transaction_id) VALUES ($1, $2, $3, $4) RETURNING *",
+    [amount, status, payment_date, transaction_id]
   );
   return result.rows[0];
 };
 
 export const editDocument = async (
   id,
-  { request_id, file_path, file_type }
+  { amount, status, payment_date, transaction_id }
 ) => {
   const result = await db.query(
-    "UPDATE documents SET request_id = $1, file_path = $2, file_type = $3 WHERE id = $4 RETURNING *",
-    [request_id, file_path, file_type, id]
+    "UPDATE documents SET amount = $1, status = $2, payment_date = $3, transaction_id = $4 WHERE id = $5 RETURNING *",
+    [amount, status, payment_date, transaction_id, id]
   );
   return result.rows[0];
 };
