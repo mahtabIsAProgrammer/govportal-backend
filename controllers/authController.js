@@ -1,18 +1,19 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { createUser, getUserByEmail } from "../models/userModels.js";
+import { createUser, getUserByEmailOrUsername } from "../models/userModels.js";
+import { generateToken } from "../utils/jwt.js";
 
 export const register = async (req, res) => {
-  try {
-    const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, identifier, password } = req.body;
 
-    if (!first_name || !last_name || !email || !password) {
+  try {
+    if (!first_name || !last_name || !username || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const existing = await getUserByEmail(email);
+    const existing = await getUserByEmailOrUsername(identifier);
     if (existing) {
-      return res.status(400).json({ error: "Email already registered" });
+      return res.status(400).json({ error: "Email / username already exist" });
     }
 
     const newUser = await createUser({
@@ -20,7 +21,8 @@ export const register = async (req, res) => {
       last_name,
       email,
       password,
-      role: "Citizen",
+      username,
+      role: "citizen",
     });
 
     res.status(201).json({ message: "User registered", user: newUser });
@@ -31,26 +33,22 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const { identifier, password } = req.body;
 
-    const user = await getUserByEmail(email);
+  try {
+    const user = await getUserByEmailOrUsername(identifier);
     if (!user) {
-      return res.status(400).json({ error: "Invalid email or password" });
+      return res.status(400).json({ error: "User Not Found!" });
     }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(400).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Password is Wrong" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = generateToken(user);
 
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token, user });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Internal Server Error" });

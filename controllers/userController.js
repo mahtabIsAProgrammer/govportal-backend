@@ -42,13 +42,14 @@ export const addUser = async (req, res) => {
     department_id,
     image,
     phone_number,
+    username,
     is_active,
   } = req.body;
 
   try {
-    if (!first_name || !last_name || !national_id || !password) {
+    if (!first_name || !last_name || !username || !password) {
       return res.status(400).json({
-        error: "first_name, last_name, national_id, and password are required",
+        error: "first_name, last_name, username, and password are required",
       });
     }
     const newUser = await createUser({
@@ -63,6 +64,7 @@ export const addUser = async (req, res) => {
       image,
       phone_number,
       is_active,
+      username,
     });
     res.status(201).json(newUser);
   } catch (err) {
@@ -84,6 +86,7 @@ export const updateUser = async (req, res) => {
     image,
     phone_number,
     is_active,
+    username,
   } = req.body;
   try {
     const updated = await editUser(id, {
@@ -98,6 +101,7 @@ export const updateUser = async (req, res) => {
       image,
       phone_number,
       is_active,
+      username,
     });
 
     if (!updated) {
