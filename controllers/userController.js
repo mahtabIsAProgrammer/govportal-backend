@@ -7,11 +7,20 @@ import {
 
 export const getUsers = async (req, res) => {
   try {
-    const data = await getAllUsers();
-    res.json(data);
-  } catch (err) {
-    console.log("Error fetching users: ", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    const { search } = req.query;
+    const users = await getAllUsers({ search });
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 

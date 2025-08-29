@@ -8,11 +8,17 @@ import {
 
 export const getDepartments = async (req, res) => {
   try {
-    const data = await getAllDepartments();
-    res.json(data);
+    const { search } = req.params;
+    const data = await getAllDepartments({ search });
+
+    res.status(200).json({
+      success: true,
+      count: data.length,
+      data: data,
+    });
   } catch (err) {
     console.log("Error fetching departments: ", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 

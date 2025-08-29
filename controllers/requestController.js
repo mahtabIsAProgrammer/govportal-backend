@@ -4,6 +4,7 @@ import {
   getAllRequests,
   requestById,
   removeRequest,
+  editRequestStatus,
 } from "../models/requestModels.js";
 
 export const getRequests = async (req, res) => {
@@ -71,6 +72,27 @@ export const updateRequest = async (req, res) => {
   } catch (err) {
     console.log("Error updating requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const updateRequestStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedRequest = await editRequestStatus(id, status);
+
+    if (!updatedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    return res.json({
+      message: "Request status updated successfully",
+      request: updatedRequest,
+    });
+  } catch (error) {
+    console.error("Error updating request status:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 

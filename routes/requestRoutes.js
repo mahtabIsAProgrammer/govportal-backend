@@ -6,11 +6,12 @@ import {
   getRequests,
   updateRequest,
 } from "../controllers/requestController.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = e.Router();
 
-router.get("/", getRequests);
-router.post("/", addRequest);
+router.get("/", authenticateToken, getRequests);
+router.post("/", authenticateToken, addRequest);
 router.get("/:id", getRequestById);
 router.put("/:id", updateRequest);
 router.delete("/:id", deleteRequest);

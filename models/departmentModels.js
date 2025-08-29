@@ -1,7 +1,14 @@
 import db from "../config/db.js";
 
-export const getAllDepartments = async () => {
-  const result = await db.query("SELECT * FROM departments");
+export const getAllDepartments = async ({ search }) => {
+  let query = `SELECT * FROM departments`;
+  let values = [];
+  if (search) {
+    query += `WHERE name ILIKE $1`;
+    values.push(`%${search}%`);
+  }
+
+  const result = await db.query(query, values);
 
   return result.rows;
 };

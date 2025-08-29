@@ -1,7 +1,28 @@
 import db from "../config/db.js";
 
-export const getAllServices = async () => {
-  const result = await db.query("SELECT * FROM services");
+export const getAllServices = async ({ search, department_id }) => {
+  let query = `
+  SELECT *
+  FROM services`;
+
+  let conditions = [];
+  let values = [];
+
+  if (search) {
+    values.push(`%${search}%`);
+    conditions.push(`name ILIKE $${values.length}`);
+  }
+
+  if (department_id) {
+    values.push(department_id);
+    conditions.push(`department_id = $${values.length}`);
+  }
+
+  if (conditions.length > 0) {
+    query += ` WHERE ` + conditions.join(" AND ");
+  }
+
+  const result = await db.query(query, values);
 
   return result.rows;
 };
