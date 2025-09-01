@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 
 import db from "../config/db.js";
 
-export const getAllUsers = async ({ search, department_id }) => {
+export const getAllUsers = async ({ search, role, department_id }) => {
   let query = `
     SELECT * 
     FROM users
@@ -18,7 +18,13 @@ export const getAllUsers = async ({ search, department_id }) => {
   )`);
     values.push(`%${search}%`);
   }
+
   if (department_id) {
+    values.push(department_id);
+    conditions.push(`WHERE ${conditions.join(" AND ")}`);
+  }
+
+  if (role) {
     values.push(department_id);
     conditions.push(`WHERE ${conditions.join(" AND ")}`);
   }
