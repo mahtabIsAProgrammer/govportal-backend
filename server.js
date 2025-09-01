@@ -1,19 +1,21 @@
 import e from "express";
+import cors from "cors";
 
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
-import requestDataRoutes from "./routes/requestDataRoutes.js";
-import departmentRoutes from "./routes/departmentRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
-import documentRoutes from "./routes/documentRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
+import departmentRoutes from "./routes/departmentRoutes.js";
+import requestDataRoutes from "./routes/requestDataRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = e();
 const PORT = 3000 || process.env.PORT;
 
 app.use(e.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Welcome to Government Portal");

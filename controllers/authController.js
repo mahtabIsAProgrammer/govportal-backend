@@ -32,7 +32,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const getToken = async (req, res) => {
   const { identifier, password } = req.body;
 
   try {
