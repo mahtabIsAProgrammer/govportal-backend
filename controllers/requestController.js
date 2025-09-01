@@ -9,8 +9,18 @@ import {
 
 export const getRequests = async (req, res) => {
   try {
-    const data = await getAllRequests();
-    res.json(data);
+    const { reviewed_by, citizen_id, status, service_id } = req.query;
+    const data = await getAllRequests({
+      status,
+      service_id,
+      citizen_id,
+      reviewed_by,
+    });
+    res.status(200).json({
+      success: true,
+      count: data.length,
+      data: data,
+    });
   } catch (err) {
     console.log("Error fetching requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });

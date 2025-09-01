@@ -1,7 +1,19 @@
 import db from "../config/db.js";
 
-export const getAllDocuments = async () => {
-  const result = await db.query("SELECT * FROM documents");
+export const getAllDocuments = async ({ request_id }) => {
+  let values = [];
+  let conditions = [];
+  let query = "SELECT * FROM documents";
+
+  if (request_id) {
+    values.push(request_id);
+    conditions.push(`request_id = ${values.length}`);
+  }
+  if (conditions.length > 0) {
+    query += `WHERE ${conditions.join(" AND ")}`;
+  }
+
+  const result = await db.query(query, values);
 
   return result.rows;
 };

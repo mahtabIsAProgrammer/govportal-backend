@@ -7,8 +7,8 @@ import {
 
 export const getUsers = async (req, res) => {
   try {
-    const { search } = req.query;
-    const users = await getAllUsers({ search });
+    const { search, department_id } = req.query;
+    const users = await getAllUsers({ search, department_id });
 
     res.status(200).json({
       success: true,

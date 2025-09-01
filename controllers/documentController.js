@@ -8,8 +8,13 @@ import {
 
 export const getDocuments = async (req, res) => {
   try {
-    const data = await getAllDocuments();
-    res.json(data);
+    const { request_id } = req.query;
+    const data = await getAllDocuments({ request_id });
+    res.status(200).json({
+      success: true,
+      count: data.length,
+      data: data,
+    });
   } catch (err) {
     console.log("Error fetching documents: ", err);
     res.status(500).json({ error: "Internal Server Error" });
