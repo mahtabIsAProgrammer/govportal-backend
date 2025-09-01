@@ -3,30 +3,30 @@ import bcrypt from "bcrypt";
 import db from "../config/db.js";
 
 export const getAllUsers = async ({ search, role, department_id }) => {
-  let query = `
-    SELECT * 
-    FROM users
-  `;
+  let query = "SELECT * FROM users";
 
   let conditions = [];
   let values = [];
 
   if (search) {
-    conditions.push(`(
-    CONCAT(first_name, ' ', last_name) ILIKE $${values.length}
-    OR username ILIKE $${values.length}
-  )`);
     values.push(`%${search}%`);
+    conditions.push(
+      `CONCAT(first_name, ' ', last_name) ILIKE $${values.length}`
+    );
   }
 
   if (department_id) {
     values.push(department_id);
-    conditions.push(`WHERE ${conditions.join(" AND ")}`);
+    conditions.push(`department_id = $${values.length}`);
   }
 
   if (role) {
-    values.push(department_id);
-    conditions.push(`WHERE ${conditions.join(" AND ")}`);
+    values.push(role);
+    conditions.push(`role = $${values.length}`);
+  }
+
+  if (conditions.length > 0) {
+    query += ` WHERE ` + conditions.join(" AND ");
   }
 
   const result = await db.query(query, values);
