@@ -15,7 +15,11 @@ const app = e();
 const PORT = 3000 || process.env.PORT;
 
 app.use(e.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Government Portal");
