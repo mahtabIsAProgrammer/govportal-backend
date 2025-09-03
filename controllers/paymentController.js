@@ -1,9 +1,9 @@
 import {
-  createPayment,
   editPayment,
-  getAllPayments,
   paymentById,
   removePayment,
+  createPayment,
+  getAllPayments,
 } from "../models/paymentModels.js";
 
 export const getPayments = async (req, res) => {

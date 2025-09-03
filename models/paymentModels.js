@@ -8,6 +8,7 @@ export const getAllPayments = async () => {
 
 export const paymentById = async (id) => {
   const result = await db.query("SELECT * FROM payments WHERE id = $1", [id]);
+
   return result.rows[0];
 };
 

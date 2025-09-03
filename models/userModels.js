@@ -11,7 +11,7 @@ export const getAllUsers = async ({ search, role, department_id }) => {
   if (search) {
     values.push(`%${search}%`);
     conditions.push(
-      `CONCAT(first_name, ' ', last_name) ILIKE $${values.length}`
+      `CONCAT(first_name,' ', last_name) ILIKE $${values.length}`
     );
   }
 
