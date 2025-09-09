@@ -1,41 +1,34 @@
 import db from "../config/db.js";
 
 export const getAllRequests = async ({
-  status,
-  service_id,
-  reviewed_by,
-  citizen_id,
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
 }) => {
-  let query = "SELECT * FROM requests";
+  let query = `
+    SELECT * 
+    FROM users
+  `;
   let values = [];
   let conditions = [];
 
-  if (citizen_id) {
-    values.push(citizen_id);
-    conditions.push(`citizen_id = $${values.length}`);
-  }
-
-  if (status) {
-    values.push(status);
-    conditions.push(`status = $${values.length}`);
-  }
-
-  if (service_id) {
-    values.push(service_id);
-    conditions.push(`service_id = $${values.length}`);
-  }
-
-  if (reviewed_by) {
-    values.push(reviewed_by);
-    conditions.push(`reviewed_by = $${values.length}`);
+  if (keyword) {
+    values.push(`%${keyword}%`);
+    conditions.push(`service_id ILIKE $${values.length}`);
   }
 
   if (conditions.length > 0) {
-    query += ` WHERE ` + conditions.join(" AND ");
+    query += " WHERE " + conditions.join(" AND ");
   }
 
-  const result = await db.query(query, values);
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
 
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
+
+  const result = await db.query(query, values);
   return result.rows;
 };
 

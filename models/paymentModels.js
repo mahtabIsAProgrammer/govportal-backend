@@ -1,8 +1,34 @@
 import db from "../config/db.js";
 
-export const getAllPayments = async () => {
-  const result = await db.query("SELECT * FROM payments");
+export const getAllPayments = async ({
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
+}) => {
+  let query = `
+    SELECT * 
+    FROM payments
+  `;
+  let values = [];
+  let conditions = [];
 
+  if (keyword) {
+    values.push(`%${keyword}%`);
+    conditions.push(`amount ILIKE $${values.length}`);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
+
+  const result = await db.query(query, values);
   return result.rows;
 };
 

@@ -8,8 +8,19 @@ import {
 
 export const getPayments = async (req, res) => {
   try {
-    const data = await getAllPayments();
-    res.json(data);
+    const { pageNumber, pageSize, keyword } = req.query;
+
+    const data = await getAllPayments({
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
+    });
+
+    res.status(200).json({
+      success: true,
+      count: data.length,
+      data,
+    });
   } catch (err) {
     console.log("Error fetching payments: ", err);
     res.status(500).json({ error: "Internal Server Error" });

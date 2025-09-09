@@ -8,12 +8,18 @@ import {
 
 export const getServices = async (req, res) => {
   try {
-    const { search, department_id } = req.query;
-    const data = await getAllServices({ search, department_id });
+    const { pageNumber, pageSize, keyword } = req.query;
+
+    const data = await getAllServices({
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
+    });
+
     res.status(200).json({
       success: true,
       count: data.length,
-      data: data,
+      data,
     });
   } catch (err) {
     console.log("Error fetching services: ", err);

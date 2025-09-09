@@ -1,20 +1,25 @@
 import {
-  createDepartment,
   editDepartment,
-  getAllDepartments,
   departmentById,
+  createDepartment,
   removeDepartment,
+  getAllDepartments,
 } from "../models/departmentModels.js";
 
 export const getDepartments = async (req, res) => {
   try {
-    const { search } = req.params;
-    const data = await getAllDepartments({ search });
+    const { pageNumber, pageSize, keyword } = req.query;
+
+    const data = await getAllDepartments({
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
+    });
 
     res.status(200).json({
       success: true,
       count: data.length,
-      data: data,
+      data,
     });
   } catch (err) {
     console.log("Error fetching departments: ", err);

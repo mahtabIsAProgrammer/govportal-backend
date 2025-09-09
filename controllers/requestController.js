@@ -9,17 +9,18 @@ import {
 
 export const getRequests = async (req, res) => {
   try {
-    const { reviewed_by, citizen_id, status, service_id } = req.query;
+    const { pageNumber, pageSize, keyword } = req.query;
+
     const data = await getAllRequests({
-      status,
-      service_id,
-      citizen_id,
-      reviewed_by,
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
     });
+
     res.status(200).json({
       success: true,
       count: data.length,
-      data: data,
+      data,
     });
   } catch (err) {
     console.log("Error fetching requests: ", err);

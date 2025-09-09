@@ -1,6 +1,10 @@
 import db from "../config/db.js";
 
-export const getAllServices = async ({ search, department_id }) => {
+export const getAllServices = async ({
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
+}) => {
   let query = `
   SELECT *
   FROM services`;
@@ -8,22 +12,23 @@ export const getAllServices = async ({ search, department_id }) => {
   let conditions = [];
   let values = [];
 
-  if (search) {
-    values.push(`%${search}%`);
+  if (keyword) {
+    values.push(`%${keyword}%`);
     conditions.push(`name ILIKE $${values.length}`);
   }
 
-  if (department_id) {
-    values.push(department_id);
-    conditions.push(`department_id = $${values.length}`);
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
   }
 
-  if (conditions.length > 0) {
-    query += ` WHERE ` + conditions.join(" AND ");
-  }
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
 
   const result = await db.query(query, values);
-
   return result.rows;
 };
 

@@ -7,13 +7,18 @@ import {
 
 export const getUsers = async (req, res) => {
   try {
-    const { search, department_id, role } = req.query;
-    const users = await getAllUsers({ search, department_id, role });
+    const { pageNumber, pageSize, keyword } = req.query;
+
+    const data = await getAllUsers({
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
+    });
 
     res.status(200).json({
       success: true,
-      count: users.length,
-      data: users,
+      count: data.length,
+      data,
     });
   } catch (error) {
     console.error("Error fetching users:", error);

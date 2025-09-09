@@ -1,15 +1,31 @@
 import db from "../config/db.js";
 
-export const getAllDepartments = async ({ search }) => {
+export const getAllDepartments = async ({
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
+}) => {
   let query = `SELECT * FROM departments`;
   let values = [];
-  if (search) {
+  let conditions = [];
+
+  if (keyword) {
     query += `WHERE name ILIKE $1`;
-    values.push(`%${search}%`);
+    values.push(`%${keyword}%`);
   }
 
-  const result = await db.query(query, values);
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
 
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
+
+  const result = await db.query(query, values);
   return result.rows;
 };
 

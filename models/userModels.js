@@ -2,35 +2,37 @@ import bcrypt from "bcrypt";
 
 import db from "../config/db.js";
 
-export const getAllUsers = async ({ search, role, department_id }) => {
-  let query = "SELECT * FROM users";
-
-  let conditions = [];
+export const getAllUsers = async ({
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
+}) => {
+  let query = `
+    SELECT * 
+    FROM users
+  `;
   let values = [];
+  let conditions = [];
 
-  if (search) {
-    values.push(`%${search}%`);
+  if (keyword) {
+    values.push(`%${keyword}%`);
     conditions.push(
-      `CONCAT(first_name,' ', last_name) ILIKE $${values.length}`
+      `(username ILIKE $${values.length} OR CONCAT(first_name, ' ', last_name) ILIKE $${values.length})`
     );
   }
 
-  if (department_id) {
-    values.push(department_id);
-    conditions.push(`department_id = $${values.length}`);
-  }
-
-  if (role) {
-    values.push(role);
-    conditions.push(`role = $${values.length}`);
-  }
-
   if (conditions.length > 0) {
-    query += ` WHERE ` + conditions.join(" AND ");
+    query += " WHERE " + conditions.join(" AND ");
   }
+
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
 
   const result = await db.query(query, values);
-
   return result.rows;
 };
 
@@ -104,6 +106,7 @@ export const editUser = async (
     [
       first_name,
       last_name,
+      national_id,
       date_of_birth,
       email,
       role,
@@ -114,6 +117,14 @@ export const editUser = async (
       username,
       id,
     ]
+  );
+  return result.rows[0];
+};
+
+export const updatePassword = async (id, newPassword) => {
+  const result = await db.query(
+    "UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+    [newPassword, id]
   );
   return result.rows[0];
 };

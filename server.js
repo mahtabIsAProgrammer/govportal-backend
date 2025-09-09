@@ -7,6 +7,7 @@ import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
+import profileInfoRoutes from "./routes/profileInfoRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import requestDataRoutes from "./routes/requestDataRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
@@ -25,15 +26,16 @@ app.get("/", (req, res) => {
   res.send("Welcome to Government Portal");
 });
 
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/services", serviceRoutes);
-app.use("/requests", requestRoutes);
-app.use("/reques_data", requestDataRoutes);
-app.use("/documents", documentRoutes);
-app.use("/payments", paymentRoutes);
-app.use("/departments", departmentRoutes);
-app.use("/notifications", notificationRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/services", serviceRoutes);
+app.use("/api/requests", requestRoutes);
+app.use("/api/reques-data", requestDataRoutes);
+app.use("/api/profile-info", profileInfoRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.listen(PORT, () =>
   console.log(`Server is running on http://localhost:${PORT}`)

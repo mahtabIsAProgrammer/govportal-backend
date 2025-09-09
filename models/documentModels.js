@@ -1,20 +1,32 @@
 import db from "../config/db.js";
 
-export const getAllDocuments = async ({ request_id }) => {
-  let values = [];
-  let conditions = [];
+export const getAllDocuments = async ({
+  pageNumber = 1,
+  pageSize = 10,
+  keyword,
+}) => {
   let query = "SELECT * FROM documents";
 
-  if (request_id) {
-    values.push(request_id);
-    conditions.push(`request_id = ${values.length}`);
+  let values = [];
+  let conditions = [];
+
+  if (keyword) {
+    values.push(`%${keyword}%`);
+    conditions.push(`file_path ILIKE $${values.length}`);
   }
+
   if (conditions.length > 0) {
-    query += `WHERE ${conditions.join(" AND ")}`;
+    query += " WHERE " + conditions.join(" AND ");
   }
+
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
 
   const result = await db.query(query, values);
-
   return result.rows;
 };
 

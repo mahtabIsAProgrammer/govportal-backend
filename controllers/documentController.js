@@ -8,12 +8,18 @@ import {
 
 export const getDocuments = async (req, res) => {
   try {
-    const { request_id } = req.query;
-    const data = await getAllDocuments({ request_id });
+    const { pageNumber, pageSize, keyword } = req.query;
+
+    const data = await getAllDocuments({
+      pageNumber: parseInt(pageNumber) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      keyword,
+    });
+
     res.status(200).json({
       success: true,
       count: data.length,
-      data: data,
+      data,
     });
   } catch (err) {
     console.log("Error fetching documents: ", err);
