@@ -10,7 +10,7 @@ export const getDocuments = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword } = req.query;
 
-    const data = await getAllDocuments({
+    const { data, totalCount, totalPages } = await getAllDocuments({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
@@ -19,6 +19,8 @@ export const getDocuments = async (req, res) => {
     res.status(200).json({
       success: true,
       count: data.length,
+      totalCount,
+      totalPages,
       data,
     });
   } catch (err) {

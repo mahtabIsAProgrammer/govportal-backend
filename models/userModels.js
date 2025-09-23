@@ -11,19 +11,31 @@ export const getAllUsers = async ({
     SELECT * 
     FROM users
   `;
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM users
+  `;
+
+  let countValues = [];
   let values = [];
   let conditions = [];
 
   if (keyword) {
+    countValues.push(`%${keyword}%`);
     values.push(`%${keyword}%`);
     conditions.push(
-      `(username ILIKE $${values.length} OR CONCAT(first_name, ' ', last_name) ILIKE $${values.length})`
+      `(username ILIKE $1 OR CONCAT(first_name, ' ', last_name) ILIKE $1)`
     );
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
   }
+
+  const countResult = await db.query(countQuery, countValues);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
@@ -31,9 +43,13 @@ export const getAllUsers = async ({
   query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
     values.length
   }`;
+  const dataResult = await db.query(query, values);
 
-  const result = await db.query(query, values);
-  return result.rows;
+  return {
+    userData: dataResult.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const userById = async (id) => {

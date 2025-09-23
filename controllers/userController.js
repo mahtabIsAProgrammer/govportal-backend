@@ -9,16 +9,18 @@ export const getUsers = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword } = req.query;
 
-    const data = await getAllUsers({
+    const { userData, totalCount, totalPages } = await getAllUsers({
       pageNumber: parseInt(pageNumber) || 1,
-      pageSize: parseInt(pageSize) || 10,
+      pageSize: parseInt(pageSize) || 5,
       keyword,
     });
 
     res.status(200).json({
       success: true,
-      count: data.length,
-      data,
+      count: userData?.length,
+      totalCount,
+      totalPages,
+      data: userData,
     });
   } catch (error) {
     console.error("Error fetching users:", error);

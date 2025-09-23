@@ -9,17 +9,30 @@ export const getAllPayments = async ({
     SELECT * 
     FROM payments
   `;
+
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM payments
+  `;
+
   let values = [];
+  let countValues = [];
   let conditions = [];
 
   if (keyword) {
     values.push(`%${keyword}%`);
+    countValues.push(`%${keyword}%`);
     conditions.push(`amount ILIKE $${values.length}`);
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
   }
+
+  const countResult = await db.query(countQuery, countValues);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
@@ -29,7 +42,11 @@ export const getAllPayments = async ({
   }`;
 
   const result = await db.query(query, values);
-  return result.rows;
+  return {
+    data: result.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const paymentById = async (id) => {
@@ -43,21 +60,22 @@ export const createPayment = async ({
   status,
   payment_date,
   transaction_id,
+  request_id,
 }) => {
   const result = await db.query(
-    "INSERT INTO payments (amount, status, payment_date, transaction_id) VALUES ($1, $2, $3, $4) RETURNING *",
-    [amount, status, payment_date, transaction_id]
+    "INSERT INTO payments (amount, status, payment_date, transaction_id, request_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    [amount, status, payment_date, transaction_id, request_id]
   );
   return result.rows[0];
 };
 
 export const editPayment = async (
   id,
-  { amount, status, payment_date, transaction_id }
+  { amount, status, payment_date, transaction_id, request_id }
 ) => {
   const result = await db.query(
-    "UPDATE payments SET amount = $1, status = $2, payment_date = $3, transaction_id = $4 WHERE id = $5 RETURNING *",
-    [amount, status, payment_date, transaction_id, id]
+    "UPDATE payments SET amount = $1, status = $2, payment_date = $3, transaction_id = $4, request_id = $5 WHERE id = $6 RETURNING *",
+    [amount, status, payment_date, transaction_id, request_id, id]
   );
   return result.rows[0];
 };

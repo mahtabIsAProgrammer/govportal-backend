@@ -54,7 +54,6 @@ export const updateProfileInfo = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    console.log("🚀 ~ changePassword ~ oldPassword:", oldPassword);
     if (!oldPassword || !newPassword) {
       return res
         .status(400)

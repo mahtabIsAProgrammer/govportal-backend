@@ -4,6 +4,7 @@ import {
   getAllRequestData,
   requestDataById,
   removeRequestData,
+  requestDataByRequestId,
 } from "../models/requestDataModels.js";
 
 export const getRequestData = async (req, res) => {
@@ -32,6 +33,21 @@ export const getRequestDataById = async (req, res) => {
 
   try {
     const requestData = await requestDataById(id);
+    if (!requestData) {
+      return res.status(404).json({ error: "RequestData not found" });
+    }
+    res.json(requestData);
+  } catch (err) {
+    console.log("Error fetching requestData by id: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getRequestDataByRequestId = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const requestData = await requestDataByRequestId(id);
     if (!requestData) {
       return res.status(404).json({ error: "RequestData not found" });
     }

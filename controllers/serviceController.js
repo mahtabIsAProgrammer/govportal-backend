@@ -8,17 +8,20 @@ import {
 
 export const getServices = async (req, res) => {
   try {
-    const { pageNumber, pageSize, keyword } = req.query;
+    const { pageNumber, pageSize, keyword, department_id } = req.query;
 
-    const data = await getAllServices({
+    const { totalCount, totalPages, data } = await getAllServices({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
+      department_id,
     });
 
     res.status(200).json({
       success: true,
       count: data.length,
+      totalCount,
+      totalPages,
       data,
     });
   } catch (err) {

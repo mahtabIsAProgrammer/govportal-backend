@@ -6,18 +6,29 @@ export const getAllDocuments = async ({
   keyword,
 }) => {
   let query = "SELECT * FROM documents";
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM documents
+  `;
 
   let values = [];
+  let countValues = [];
   let conditions = [];
 
   if (keyword) {
     values.push(`%${keyword}%`);
+    countValues.push(`%${keyword}%`);
     conditions.push(`file_path ILIKE $${values.length}`);
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
   }
+
+  const countResult = await db.query(countQuery, countValues);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
@@ -27,7 +38,11 @@ export const getAllDocuments = async ({
   }`;
 
   const result = await db.query(query, values);
-  return result.rows;
+  return {
+    data: result.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const documentById = async (id) => {

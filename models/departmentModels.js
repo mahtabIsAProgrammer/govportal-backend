@@ -6,17 +6,29 @@ export const getAllDepartments = async ({
   keyword,
 }) => {
   let query = `SELECT * FROM departments`;
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM departments
+  `;
+
   let values = [];
+  let countValues = [];
   let conditions = [];
 
   if (keyword) {
-    query += `WHERE name ILIKE $1`;
     values.push(`%${keyword}%`);
+    countValues.push(`%${keyword}%`);
+    conditions.push(`name ILIKE $${values.length}`);
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
   }
+
+  const countResult = await db.query(countQuery, countValues);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
@@ -26,7 +38,11 @@ export const getAllDepartments = async ({
   }`;
 
   const result = await db.query(query, values);
-  return result.rows;
+  return {
+    data: result.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const departmentById = async (id) => {

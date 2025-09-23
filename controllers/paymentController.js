@@ -10,7 +10,7 @@ export const getPayments = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword } = req.query;
 
-    const data = await getAllPayments({
+    const { data, totalCount, totalPages } = await getAllPayments({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
@@ -19,6 +19,8 @@ export const getPayments = async (req, res) => {
     res.status(200).json({
       success: true,
       count: data.length,
+      totalCount,
+      totalPages,
       data,
     });
   } catch (err) {
@@ -43,7 +45,7 @@ export const getPaymentById = async (req, res) => {
 };
 
 export const addPayment = async (req, res) => {
-  const { amount, status, payment_date, transaction_id } = req.body;
+  const { amount, status, payment_date, transaction_id, request_id } = req.body;
 
   try {
     if (!user_id) {
@@ -56,6 +58,7 @@ export const addPayment = async (req, res) => {
       status,
       payment_date,
       transaction_id,
+      request_id,
     });
     res.status(201).json(newPayment);
   } catch (err) {
@@ -65,11 +68,12 @@ export const addPayment = async (req, res) => {
 };
 export const updatePayment = async (req, res) => {
   const { id } = req.params;
-  const { amount, status, payment_date, transaction_id } = req.body;
+  const { amount, status, payment_date, transaction_id, request_id } = req.body;
   try {
     const updated = await editPayment(id, {
       amount,
       status,
+      request_id,
       payment_date,
       transaction_id,
     });

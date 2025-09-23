@@ -54,3 +54,21 @@ export const getToken = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const identityVerify = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Identity verify failed:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};

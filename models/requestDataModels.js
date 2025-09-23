@@ -30,6 +30,14 @@ export const requestDataById = async (id) => {
   return result.rows[0];
 };
 
+export const requestDataByRequestId = async (id) => {
+  const result = await db.query(
+    "SELECT * FROM request_data WHERE request_id = $1",
+    [id]
+  );
+  return result.rows[0];
+};
+
 export const createRequestData = async ({ request_id, form_data }) => {
   const result = await db.query(
     "INSERT INTO request_data (request_id, form_data) VALUES ($1, $2) RETURNING *",

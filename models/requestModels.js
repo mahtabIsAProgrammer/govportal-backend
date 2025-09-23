@@ -4,11 +4,17 @@ export const getAllRequests = async ({
   pageNumber = 1,
   pageSize = 10,
   keyword,
+  status,
 }) => {
   let query = `
     SELECT * 
-    FROM users
+    FROM requests
   `;
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM requests
+  `;
+
   let values = [];
   let conditions = [];
 
@@ -17,9 +23,19 @@ export const getAllRequests = async ({
     conditions.push(`service_id ILIKE $${values.length}`);
   }
 
-  if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+  if (status) {
+    values.push(status);
+    conditions.push(`status = $${values.length}`);
   }
+
+  if (conditions.length > 0) {
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
+  }
+
+  const countResult = await db.query(countQuery, values);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
@@ -29,7 +45,11 @@ export const getAllRequests = async ({
   }`;
 
   const result = await db.query(query, values);
-  return result.rows;
+  return {
+    data: result.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const requestById = async (id) => {

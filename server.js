@@ -1,7 +1,10 @@
 import e from "express";
 import cors from "cors";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
 
 import userRoutes from "./routes/userRoutes.js";
+import fileRoutes from "./routes/fileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
@@ -15,6 +18,9 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 const app = e();
 const PORT = 3000 || process.env.PORT;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 app.use(e.json());
 app.use(
   cors({
@@ -26,11 +32,14 @@ app.get("/", (req, res) => {
   res.send("Welcome to Government Portal");
 });
 
+app.use("/uploads", e.static(path.join(__dirname, "uploads")));
+
+app.use("/api", fileRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
-app.use("/api/reques-data", requestDataRoutes);
+app.use("/api/request-data", requestDataRoutes);
 app.use("/api/profile-info", profileInfoRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/payments", paymentRoutes);

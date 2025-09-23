@@ -1,25 +1,28 @@
 import {
-  createRequest,
   editRequest,
-  getAllRequests,
   requestById,
+  getAllRequests,
+  createRequest,
   removeRequest,
   editRequestStatus,
 } from "../models/requestModels.js";
 
 export const getRequests = async (req, res) => {
   try {
-    const { pageNumber, pageSize, keyword } = req.query;
+    const { pageNumber, pageSize, keyword, status } = req.query;
 
-    const data = await getAllRequests({
+    const { data, totalCount, totalPages } = await getAllRequests({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
+      status,
     });
 
     res.status(200).json({
       success: true,
       count: data.length,
+      totalCount,
+      totalPages,
       data,
     });
   } catch (err) {

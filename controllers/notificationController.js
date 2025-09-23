@@ -2,23 +2,28 @@ import {
   createNotification,
   editNotification,
   getAllNotifications,
+  markNotificationsAsRead,
   notificationById,
   removeNotification,
 } from "../models/notificationModels.js";
 
 export const getNotifications = async (req, res) => {
   try {
-    const { pageNumber, pageSize, keyword } = req.query;
+    const { pageNumber, pageSize, keyword, user_id, is_read } = req.query;
 
-    const data = await getAllNotifications({
+    const { data, totalCount, totalPages } = await getAllNotifications({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
+      is_read,
+      user_id,
     });
 
     res.status(200).json({
       success: true,
       count: data.length,
+      totalCount,
+      totalPages,
       data,
     });
   } catch (err) {
@@ -43,7 +48,7 @@ export const getNotificationById = async (req, res) => {
 };
 
 export const addNotification = async (req, res) => {
-  const { user_id, message, is_read } = req.body;
+  const { user_id, message, is_read, title } = req.body;
 
   try {
     if (!user_id) {
@@ -55,6 +60,7 @@ export const addNotification = async (req, res) => {
       user_id,
       message,
       is_read,
+      title,
     });
     res.status(201).json(newNotification);
   } catch (err) {
@@ -64,12 +70,13 @@ export const addNotification = async (req, res) => {
 };
 export const updateNotification = async (req, res) => {
   const { id } = req.params;
-  const { user_id, message, is_read } = req.body;
+  const { user_id, message, is_read, title } = req.body;
   try {
     const updated = await editNotification(id, {
       user_id,
       message,
       is_read,
+      title,
     });
 
     if (!updated) {
@@ -80,6 +87,29 @@ export const updateNotification = async (req, res) => {
   } catch (err) {
     console.log("Error updating notifications: ", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const notificationsUpdateIsRead = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, error: "ids array is required" });
+    }
+
+    const updated = await markNotificationsAsRead(ids);
+
+    res.json({
+      success: true,
+      count: updated.length,
+      data: updated,
+    });
+  } catch (err) {
+    console.error("Error marking notifications as read:", err);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 
