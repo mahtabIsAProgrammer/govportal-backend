@@ -14,6 +14,7 @@ import profileInfoRoutes from "./routes/profileInfoRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import requestDataRoutes from "./routes/requestDataRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import chartsRoutes from "./routes/chartsRoutes.js";
 
 const app = e();
 const PORT = 3000 || process.env.PORT;
@@ -37,6 +38,7 @@ app.use("/uploads", e.static(path.join(__dirname, "uploads")));
 app.use("/api", fileRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/charts", chartsRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/request-data", requestDataRoutes);
