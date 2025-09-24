@@ -2,38 +2,43 @@
 import { Router } from "express";
 
 import {
-  getApprovalRejectionRates,
-  getPaymentsByMonth,
-  getPaymentsByService,
-  getRequestsByMonth,
-  getRequestsByOfficer,
-  getRequestsByService,
-  getRequestsByStatus,
+  getTotalUsers,
   getTotalAdmins,
   getTotalCitizens,
-  getTotalDepartmentHead,
   getTotalOfficers,
-  getTotalUsers,
+  getRequestsByMonth,
+  getPaymentsByMonth,
+  getRequestsByStatus,
+  getPaymentsByService,
+  getRequestsByOfficer,
+  getRequestsByService,
+  getTotalDepartmentHead,
+  getApprovalRejectionRates,
 } from "../controllers/chartsController.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 // Requests
-router.get("/requests/status", getRequestsByStatus);
-router.get("/requests/service", getRequestsByService);
-router.get("/requests/month", getRequestsByMonth);
-router.get("/requests/officer", getRequestsByOfficer);
-router.get("/requests/approval-rejection", getApprovalRejectionRates);
+router.get("/requests/status", authenticateToken, getRequestsByStatus);
+router.get("/requests/service", authenticateToken, getRequestsByService);
+router.get("/requests/month", authenticateToken, getRequestsByMonth);
+router.get("/requests/officer", authenticateToken, getRequestsByOfficer);
+router.get(
+  "/requests/approval-rejection",
+  authenticateToken,
+  getApprovalRejectionRates
+);
 
 // Payments
-router.get("/payments/month", getPaymentsByMonth);
-router.get("/payments/service", getPaymentsByService);
+router.get("/payments/month", authenticateToken, getPaymentsByMonth);
+router.get("/payments/service", authenticateToken, getPaymentsByService);
 
 // Users
-router.get("/citizens/total", getTotalCitizens);
-router.get("/officers/total", getTotalOfficers);
-router.get("/dept-head/total", getTotalDepartmentHead);
-router.get("/admin/total", getTotalAdmins);
-router.get("/all/total", getTotalUsers);
+router.get("/citizens/total", authenticateToken, getTotalCitizens);
+router.get("/officers/total", authenticateToken, getTotalOfficers);
+router.get("/dept-head/total", authenticateToken, getTotalDepartmentHead);
+router.get("/admin/total", authenticateToken, getTotalAdmins);
+router.get("/all/total", authenticateToken, getTotalUsers);
 
 export default router;

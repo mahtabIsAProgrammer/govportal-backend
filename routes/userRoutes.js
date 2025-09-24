@@ -1,16 +1,17 @@
 import e from "express";
 import {
   addUser,
-  getUserById,
   getUsers,
   updateUser,
+  getUserById,
 } from "../controllers/userController.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = e.Router();
 
-router.get("/", getUsers);
-router.post("/", addUser);
-router.get("/:id", getUserById);
-router.put("/:id", updateUser);
+router.get("/", authenticateToken, getUsers);
+router.post("/", authenticateToken, addUser);
+router.get("/:id", authenticateToken, getUserById);
+router.put("/:id", authenticateToken, updateUser);
 
 export default router;

@@ -89,6 +89,14 @@ export const editRequestStatus = async (id, status) => {
   return result.rows[0] || null;
 };
 
+export const editRequestReviewedBy = async (id, status) => {
+  const result = await db.query(
+    "UPDATE requests SET reviewed_by = $1, updated_at = NOW(), reviewed_at = NOW() WHERE id = $2 RETURNING *",
+    [status, id]
+  );
+  return result.rows[0] || null;
+};
+
 export const removeRequest = async (id) => {
   const result = await db.query(
     "DELETE FROM requests WHERE id = $1 RETURNING *",

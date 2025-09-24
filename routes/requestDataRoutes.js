@@ -1,20 +1,18 @@
 import e from "express";
 import {
   addRequestData,
-  deleteRequestData,
-  getRequestDataById,
   getRequestData,
-  updateRequestData,
   getRequestDataByRequestId,
 } from "../controllers/requestDataController.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = e.Router();
 
-router.get("/", getRequestData);
-router.post("/", addRequestData);
-router.get("/:id", getRequestDataByRequestId);
+router.get("/", authenticateToken, getRequestData);
+router.post("/", authenticateToken, addRequestData);
+router.get("/:id", authenticateToken, getRequestDataByRequestId);
 // router.get("/:id", getRequestDataById);
-router.put("/:id", updateRequestData);
-router.delete("/:id", deleteRequestData);
+// router.put("/:id", updateRequestData);
+// router.delete("/:id", deleteRequestData);
 
 export default router;

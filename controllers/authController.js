@@ -1,19 +1,18 @@
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { createUser, getUserByEmailOrUsername } from "../models/userModels.js";
 import { generateToken } from "../utils/jwt.js";
+import { createUser, getUserByEmailOrUsername } from "../models/userModels.js";
 
 export const register = async (req, res) => {
-  const { first_name, last_name, identifier, password } = req.body;
+  const { first_name, last_name, email, password } = req.body;
 
   try {
-    if (!first_name || !last_name || !username || !email || !password) {
+    if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const existing = await getUserByEmailOrUsername(identifier);
+    const existing = await getUserByEmailOrUsername(email);
     if (existing) {
-      return res.status(400).json({ error: "Email / username already exist" });
+      return res.status(400).json({ error: "Email already exist" });
     }
 
     const newUser = await createUser({
@@ -21,7 +20,6 @@ export const register = async (req, res) => {
       last_name,
       email,
       password,
-      username,
       role: "citizen",
     });
 

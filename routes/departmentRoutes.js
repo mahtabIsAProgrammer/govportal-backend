@@ -1,11 +1,12 @@
 import e from "express";
 import {
   addDepartment,
-  deleteDepartment,
-  getDepartmentById,
   getDepartments,
+  deleteDepartment,
   updateDepartment,
+  getDepartmentById,
 } from "../controllers/departmentController.js";
+import { authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = e.Router();
 
