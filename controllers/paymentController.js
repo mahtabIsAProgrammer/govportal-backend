@@ -4,16 +4,22 @@ import {
   removePayment,
   createPayment,
   getAllPayments,
+  paymentByRequestId,
 } from "../models/paymentModels.js";
 
 export const getPayments = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword } = req.query;
 
+    const currentUserRole = req.user?.role;
+    const currentUserDepartmentId = req.user?.department_id;
+
     const { data, totalCount, totalPages } = await getAllPayments({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
+      currentUserRole,
+      currentUserDepartmentId,
     });
 
     res.status(200).json({
@@ -34,6 +40,21 @@ export const getPaymentById = async (req, res) => {
 
   try {
     const payment = await paymentById(id);
+    if (!payment) {
+      return res.status(404).json({ error: "Payment not found" });
+    }
+    res.json(payment);
+  } catch (err) {
+    console.log("Error fetching payment by id: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getPaymentByRequestId = async (req, res) => {
+  const { request_id } = req.params;
+
+  try {
+    const payment = await paymentByRequestId(request_id);
     if (!payment) {
       return res.status(404).json({ error: "Payment not found" });
     }

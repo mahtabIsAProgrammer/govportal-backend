@@ -10,11 +10,16 @@ export const getServices = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword, department_id } = req.query;
 
+    const currentUserRole = req.user?.role;
+    const currentUserDepartmentId = req.user?.department_id;
+
     const { totalCount, totalPages, data } = await getAllServices({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
       department_id,
+      currentUserRole,
+      currentUserDepartmentId,
     });
 
     res.status(200).json({

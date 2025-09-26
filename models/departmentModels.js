@@ -12,12 +12,10 @@ export const getAllDepartments = async ({
   `;
 
   let values = [];
-  let countValues = [];
   let conditions = [];
 
   if (keyword) {
     values.push(`%${keyword}%`);
-    countValues.push(`%${keyword}%`);
     conditions.push(`name ILIKE $${values.length}`);
   }
 
@@ -27,7 +25,7 @@ export const getAllDepartments = async ({
     countQuery += whereClause;
   }
 
-  const countResult = await db.query(countQuery, countValues);
+  const countResult = await db.query(countQuery, values);
   const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;

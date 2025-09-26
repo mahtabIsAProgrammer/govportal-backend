@@ -5,14 +5,18 @@ export const getAllRequests = async ({
   pageSize = 10,
   keyword,
   status,
+  currentUserRole,
+  currentUserDepartmentId,
 }) => {
   let query = `
-    SELECT * 
-    FROM requests
+    SELECT r.* 
+    FROM requests r
+    JOIN services s ON r.service_id = s.id
   `;
   let countQuery = `
     SELECT COUNT(*) AS total
-    FROM requests
+    FROM requests r
+    JOIN services s ON r.service_id = s.id
   `;
 
   let values = [];
@@ -20,12 +24,17 @@ export const getAllRequests = async ({
 
   if (keyword) {
     values.push(`%${keyword}%`);
-    conditions.push(`service_id ILIKE $${values.length}`);
+    conditions.push(`r.service_id ILIKE $${values.length}`);
   }
 
   if (status) {
     values.push(status);
-    conditions.push(`status = $${values.length}`);
+    conditions.push(`r.status = $${values.length}`);
+  }
+
+  if (currentUserRole === "officer" && currentUserDepartmentId) {
+    values.push(currentUserDepartmentId);
+    conditions.push(`s.department_id = $${values.length}`);
   }
 
   if (conditions.length > 0) {
@@ -40,7 +49,7 @@ export const getAllRequests = async ({
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
 
-  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+  query += ` ORDER BY r.id DESC LIMIT $${values.length - 1} OFFSET $${
     values.length
   }`;
 
@@ -81,18 +90,10 @@ export const editRequest = async (
   return result.rows[0];
 };
 
-export const editRequestStatus = async (id, status) => {
+export const editRequestStatus = async (status, reviewed_by, id) => {
   const result = await db.query(
-    "UPDATE requests SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
-    [status, id]
-  );
-  return result.rows[0] || null;
-};
-
-export const editRequestReviewedBy = async (id, status) => {
-  const result = await db.query(
-    "UPDATE requests SET reviewed_by = $1, updated_at = NOW(), reviewed_at = NOW() WHERE id = $2 RETURNING *",
-    [status, id]
+    "UPDATE requests SET status = $1, reviewed_by = $2, updated_at = NOW() WHERE id = $3 RETURNING *",
+    [status, reviewed_by, id]
   );
   return result.rows[0] || null;
 };
@@ -103,4 +104,56 @@ export const removeRequest = async (id) => {
     [id]
   );
   return result.rows[0];
+};
+
+export const myRequests = async ({
+  userId,
+  pageNumber = 1,
+  pageSize = 10,
+  status,
+}) => {
+  let query = `
+    SELECT r.* 
+    FROM requests r
+    JOIN services s ON r.service_id = s.id
+    WHERE r.citizen_id = $1
+  `;
+  let countQuery = `
+    SELECT COUNT(*) AS total
+    FROM requests r
+    JOIN services s ON r.service_id = s.id
+    WHERE r.citizen_id = $1
+  `;
+
+  let values = [userId];
+  let conditions = [];
+
+  if (status) {
+    values.push(status);
+    conditions.push(`r.status = $${values.length}`);
+  }
+
+  if (conditions.length > 0) {
+    const whereClause = " AND " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
+  }
+
+  const countResult = await db.query(countQuery, values);
+  const totalCount = parseInt(countResult.rows[0].total, 10);
+
+  const offset = (pageNumber - 1) * pageSize;
+  values.push(pageSize, offset);
+
+  query += ` ORDER BY r.id DESC LIMIT $${values.length - 1} OFFSET $${
+    values.length
+  }`;
+
+  const result = await db.query(query, values);
+
+  return {
+    data: result.rows,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };

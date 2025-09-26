@@ -6,6 +6,7 @@ export const getAllUsers = async ({
   pageNumber = 1,
   pageSize = 10,
   keyword,
+  currentUserRole,
 }) => {
   let query = `
     SELECT * 
@@ -19,6 +20,19 @@ export const getAllUsers = async ({
   let countValues = [];
   let values = [];
   let conditions = [];
+
+  let roleCondition = null;
+  if (currentUserRole === "department_head") {
+    roleCondition = `(role = 'officer')`;
+  } else if (currentUserRole === "officer") {
+    roleCondition = `(role = 'citizen')`;
+  } else {
+    roleCondition = null;
+  }
+
+  if (roleCondition) {
+    conditions.push(roleCondition);
+  }
 
   if (keyword) {
     countValues.push(`%${keyword}%`);
@@ -78,11 +92,12 @@ export const createUser = async ({
   phone_number,
   is_active,
   username,
+  gender,
 }) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const result = await db.query(
-    "INSERT INTO users (first_name, last_name, national_id, date_of_birth, email, password, role, department_id, image, phone_number, is_active, username) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
+    "INSERT INTO users (first_name, last_name, national_id, date_of_birth, email, password, role, department_id, image, phone_number, is_active,gender, username) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *",
     [
       first_name,
       last_name,
@@ -95,6 +110,7 @@ export const createUser = async ({
       image,
       phone_number,
       is_active,
+      gender,
       username,
     ]
   );
@@ -115,10 +131,11 @@ export const editUser = async (
     phone_number,
     is_active,
     username,
+    gender,
   }
 ) => {
   const result = await db.query(
-    "UPDATE users SET first_name = $1, last_name = $2, national_id = $3, date_of_birth = $4, email = $5, role = $6, department_id = $7, image = $8, phone_number = $9, is_active = $10, username = $11, updated_at = NOW() WHERE id = $12 RETURNING *",
+    "UPDATE users SET first_name = $1, last_name = $2, national_id = $3, date_of_birth = $4, email = $5, role = $6, department_id = $7, image = $8, phone_number = $9, is_active = $10, username = $11, gender = $12, updated_at = NOW() WHERE id = $13 RETURNING *",
     [
       first_name,
       last_name,
@@ -131,6 +148,7 @@ export const editUser = async (
       phone_number,
       is_active,
       username,
+      gender,
       id,
     ]
   );

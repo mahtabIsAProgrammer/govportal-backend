@@ -5,18 +5,22 @@ import {
   removeRequest,
   getAllRequests,
   editRequestStatus,
-  editRequestReviewedBy,
+  myRequests,
 } from "../models/requestModels.js";
 
 export const getRequests = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword, status } = req.query;
+    const currentUserRole = req.user?.role;
+    const currentUserDepartmentId = req.user?.department_id;
 
     const { data, totalCount, totalPages } = await getAllRequests({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 10,
       keyword,
       status,
+      currentUserRole,
+      currentUserDepartmentId,
     });
 
     res.status(200).json({
@@ -29,6 +33,30 @@ export const getRequests = async (req, res) => {
   } catch (err) {
     console.log("Error fetching requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getMyRequests = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const { pageNumber, pageSize, status } = req.query;
+
+    const result = await myRequests({
+      pageNumber: Number(pageNumber) || 1,
+      pageSize: Number(pageSize) || 10,
+      userId,
+      status,
+    });
+
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -94,8 +122,11 @@ export const updateRequestStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
+  const userId = req.user?.id;
+
   try {
-    const updatedRequest = await editRequestStatus(id, status);
+    const updatedRequest = await editRequestStatus(status, userId, id);
+    console.log("🚀 ~ updateRequestStatus ~ updatedRequest:", updatedRequest);
 
     if (!updatedRequest) {
       return res.status(404).json({ message: "Request not found" });
@@ -107,27 +138,6 @@ export const updateRequestStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating request status:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-export const updateRequestReviewedBy = async (req, res) => {
-  const { id } = req.params;
-  const { reviewed_by } = req.body;
-
-  try {
-    const updatedRequest = await editRequestReviewedBy(id, reviewed_by);
-
-    if (!updatedRequest) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    return res.json({
-      message: "Request reviewed_by updated successfully",
-      request: updatedRequest,
-    });
-  } catch (error) {
-    console.error("Error updating request reviewed_by:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };

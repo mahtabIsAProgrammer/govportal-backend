@@ -5,6 +5,8 @@ export const getAllServices = async ({
   pageSize = 10,
   keyword,
   department_id,
+  currentUserRole,
+  currentUserDepartmentId,
 }) => {
   let query = `
   SELECT *
@@ -21,6 +23,14 @@ export const getAllServices = async ({
   if (keyword) {
     values.push(`%${keyword}%`);
     conditions.push(`name ILIKE $${values.length}`);
+  }
+
+  if (currentUserRole === "officer") {
+    const deptId = currentUserDepartmentId;
+    if (deptId != null) {
+      values.push(deptId);
+      conditions.push(`department_id = $${values.length}`);
+    }
   }
 
   if (department_id) {

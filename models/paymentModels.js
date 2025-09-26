@@ -4,25 +4,34 @@ export const getAllPayments = async ({
   pageNumber = 1,
   pageSize = 10,
   keyword,
+  currentUserRole,
+  currentUserDepartmentId,
 }) => {
   let query = `
-    SELECT * 
-    FROM payments
+    SELECT p.* 
+    FROM payments p
+    JOIN requests r ON p.request_id = r.id
+    JOIN services s ON r.service_id = s.id
   `;
 
   let countQuery = `
     SELECT COUNT(*) AS total
-    FROM payments
+    FROM payments p
+    JOIN requests r ON p.request_id = r.id
+    JOIN services s ON r.service_id = s.id
   `;
 
   let values = [];
-  let countValues = [];
   let conditions = [];
 
   if (keyword) {
     values.push(`%${keyword}%`);
-    countValues.push(`%${keyword}%`);
-    conditions.push(`amount ILIKE $${values.length}`);
+    conditions.push(`p.amount ILIKE $${values.length}`);
+  }
+
+  if (currentUserRole === "officer" && currentUserDepartmentId) {
+    values.push(currentUserDepartmentId);
+    conditions.push(`s.department_id = $${values.length}`);
   }
 
   if (conditions.length > 0) {
@@ -31,13 +40,13 @@ export const getAllPayments = async ({
     countQuery += whereClause;
   }
 
-  const countResult = await db.query(countQuery, countValues);
+  const countResult = await db.query(countQuery, values);
   const totalCount = parseInt(countResult.rows[0].total, 10);
 
   const offset = (pageNumber - 1) * pageSize;
   values.push(pageSize, offset);
 
-  query += ` ORDER BY id DESC LIMIT $${values.length - 1} OFFSET $${
+  query += ` ORDER BY p.id DESC LIMIT $${values.length - 1} OFFSET $${
     values.length
   }`;
 
@@ -51,6 +60,15 @@ export const getAllPayments = async ({
 
 export const paymentById = async (id) => {
   const result = await db.query("SELECT * FROM payments WHERE id = $1", [id]);
+
+  return result.rows[0];
+};
+
+export const paymentByRequestId = async (request_id) => {
+  const result = await db.query(
+    "SELECT * FROM payments WHERE request_id = $1",
+    [request_id]
+  );
 
   return result.rows[0];
 };

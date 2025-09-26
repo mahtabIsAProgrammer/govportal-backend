@@ -20,7 +20,6 @@ export const authenticateToken = (req, res, next) => {
 
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    console.log("🚀 ~ authorizeRoles ~ req:", req.user);
     if (!req.user) {
       return res.status(401).json({ error: "Not authenticated" });
     }

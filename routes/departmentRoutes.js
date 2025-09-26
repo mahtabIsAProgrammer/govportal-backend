@@ -6,14 +6,27 @@ import {
   updateDepartment,
   getDepartmentById,
 } from "../controllers/departmentController.js";
-import { authorizeRoles } from "../middlewares/authMiddleware.js";
+import {
+  authenticateToken,
+  authorizeRoles,
+} from "../middlewares/authMiddleware.js";
 
 const router = e.Router();
 
-router.get("/", getDepartments);
-router.post("/", addDepartment);
-router.get("/:id", getDepartmentById);
-router.put("/:id", updateDepartment);
-router.delete("/:id", deleteDepartment);
+router.get("/", authenticateToken, getDepartments);
+router.post("/", authenticateToken, authorizeRoles(["admin"]), addDepartment);
+router.get("/:id", authenticateToken, getDepartmentById);
+router.put(
+  "/:id",
+  authenticateToken,
+  authorizeRoles(["admin"]),
+  updateDepartment
+);
+router.delete(
+  "/:id",
+  authenticateToken,
+  authorizeRoles(["admin"]),
+  deleteDepartment
+);
 
 export default router;

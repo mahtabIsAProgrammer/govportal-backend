@@ -22,8 +22,9 @@ export const register = async (req, res) => {
       password,
       role: "citizen",
     });
+    const token = generateToken(newUser);
 
-    res.status(201).json({ message: "User registered", user: newUser });
+    res.status(201).json({ message: "User registered", token, user: newUser });
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: "Internal Server Error" });

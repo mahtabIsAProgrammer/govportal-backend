@@ -9,10 +9,13 @@ export const getUsers = async (req, res) => {
   try {
     const { pageNumber, pageSize, keyword } = req.query;
 
+    const currentUserRole = req.user?.role;
+
     const { userData, totalCount, totalPages } = await getAllUsers({
       pageNumber: parseInt(pageNumber) || 1,
       pageSize: parseInt(pageSize) || 5,
       keyword,
+      currentUserRole,
     });
 
     res.status(200).json({
@@ -60,6 +63,7 @@ export const addUser = async (req, res) => {
     phone_number,
     username,
     is_active,
+    gender,
   } = req.body;
 
   try {
@@ -81,6 +85,7 @@ export const addUser = async (req, res) => {
       phone_number,
       is_active,
       username,
+      gender,
     });
     res.status(201).json(newUser);
   } catch (err) {
@@ -103,6 +108,7 @@ export const updateUser = async (req, res) => {
     phone_number,
     is_active,
     username,
+    gender,
   } = req.body;
   try {
     const updated = await editUser(id, {
@@ -118,6 +124,7 @@ export const updateUser = async (req, res) => {
       phone_number,
       is_active,
       username,
+      gender,
     });
 
     if (!updated) {
