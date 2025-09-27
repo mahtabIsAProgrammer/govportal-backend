@@ -6,18 +6,18 @@ import path, { dirname } from "path";
 import userRoutes from "./routes/userRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import chartsRoutes from "./routes/chartsRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
-import profileInfoRoutes from "./routes/profileInfoRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import requestDataRoutes from "./routes/requestDataRoutes.js";
+import profileInfoRoutes from "./routes/profileInfoRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import chartsRoutes from "./routes/chartsRoutes.js";
 
 const app = e();
-const PORT = 3000 || process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
