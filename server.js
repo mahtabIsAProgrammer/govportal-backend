@@ -25,7 +25,7 @@ const __dirname = dirname(__filename);
 app.use(e.json());
 app.use(
   cors({
-    origin: "https://govportal-website.onrender.com",
+    origin: "http://localhost:5173",
   })
 );
 
