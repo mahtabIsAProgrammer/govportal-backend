@@ -1,4 +1,3 @@
-// controllers/dashboardController.ts
 import db from "../config/db.js";
 
 export const getRequestsByStatus = async (req, res) => {
@@ -45,7 +44,6 @@ export const getRequestsByMonth = async (req, res) => {
   }
 };
 
-// 4. Payments per Month
 export const getPaymentsByMonth = async (req, res) => {
   try {
     const result = await db.query(`
@@ -61,7 +59,6 @@ export const getPaymentsByMonth = async (req, res) => {
   }
 };
 
-// 5. Payments by Service
 export const getPaymentsByService = async (req, res) => {
   try {
     const result = await db.query(`
@@ -78,7 +75,6 @@ export const getPaymentsByService = async (req, res) => {
   }
 };
 
-// 6. Total Citizens
 export const getTotalCitizens = async (req, res) => {
   try {
     const result = await db.query(
@@ -93,7 +89,6 @@ export const getTotalCitizens = async (req, res) => {
   }
 };
 
-// 6. Total Officers
 export const getTotalUsers = async (req, res) => {
   try {
     const result = await db.query(`SELECT COUNT(*) AS total_users FROM users`);
@@ -132,7 +127,6 @@ export const getTotalAdmins = async (req, res) => {
   }
 };
 
-// 6. Total Head department
 export const getTotalDepartmentHead = async (req, res) => {
   try {
     const result = await db.query(
@@ -147,7 +141,6 @@ export const getTotalDepartmentHead = async (req, res) => {
   }
 };
 
-// 8. Requests per Officer
 export const getRequestsByOfficer = async (req, res) => {
   try {
     const result = await db.query(`
@@ -164,7 +157,6 @@ export const getRequestsByOfficer = async (req, res) => {
   }
 };
 
-// 9. Approval vs Rejection Rates
 export const getApprovalRejectionRates = async (req, res) => {
   try {
     const result = await db.query(`

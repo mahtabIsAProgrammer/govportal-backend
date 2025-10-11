@@ -126,7 +126,6 @@ export const updateRequestStatus = async (req, res) => {
 
   try {
     const updatedRequest = await editRequestStatus(status, userId, id);
-    console.log("🚀 ~ updateRequestStatus ~ updatedRequest:", updatedRequest);
 
     if (!updatedRequest) {
       return res.status(404).json({ message: "Request not found" });

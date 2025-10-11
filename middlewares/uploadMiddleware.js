@@ -1,8 +1,6 @@
-// middleware/upload.js
 import multer from "multer";
 import path from "path";
 
-// Allowed MIME types
 const allowedMimeTypes = [
   "image/jpeg",
   "image/png",

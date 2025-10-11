@@ -1,5 +1,3 @@
-// controllers/citizenController.js
-
 import { createPayment } from "../models/paymentModels.js";
 import { createRequestData } from "../models/requestDataModels.js";
 import { createRequest } from "../models/requestModels.js";
